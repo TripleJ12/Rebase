@@ -12,7 +12,7 @@ import javax.swing.event.*;
 
 class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionListener
 {
-	LibraryCollection movie;
+	LibraryCollection library;
 
 	//------------------------------------------------------------------------------
 	// 사용자 UI를 위해 필요한 변수들 선언 
@@ -22,26 +22,33 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 	private JPanel panel3;
 	private JPanel panel4;
 	private JPanel jp1;
-	private JPanel jp2;
+	//private JPanel jp2;
 	private JPanel jp3;
 	private JPanel jp4;
 	
 	
 	private JTextField title;
-	private JTextField image;
 	private JTextField publisher;
+	
 	private JTextField authors;
 	private JTextField isbn;
 	private JTextField availability;
 	private JTextField renting;
+	private JTextField id;
+	private JTextField pw;
+	private JTextField name;
+	private JTextField major;
 	
-	private JButton Jadd;
-	private JButton Jmod;
-	private JButton Jdel;
+	private JButton Jlogin; //로그인 버튼
+	private JButton Jjoin; //회원가입 버튼
 	
-	private JList list;
-	private JLabel icon;
-	private JTextArea info;
+	private JButton Jadd; //추가 버튼
+	private JButton Jmod; //수정 버튼
+	private JButton Jdel; //삭제 버튼
+	
+	private JList list; // 도서목록
+	//private JLabel icon;
+	private JTextArea info; //도서 정보
 	public int a;
 	
 	JMenuItem jmi1;
@@ -67,7 +74,7 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 		jmi1.setAccelerator(KeyStroke.getKeyStroke('O',Event.CTRL_MASK));//Ctrl+0
 		jmi2.setAccelerator(KeyStroke.getKeyStroke('S',Event.CTRL_MASK));//Ctrl+S
 		
-		movie=new LibraryCollection();	
+		library=new LibraryCollection();	
 
 		//------------------------------------------------------------------------------
 		// 사용자 화면에 컴포넌트들 구성하여 배치
@@ -75,20 +82,21 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 		//------------------------------------------------------------------------------
 		
 		panel1 = new JPanel();
-		panel1.add( new JLabel("도서 관리 프로그램"));
-		panel2=new JPanel(new GridLayout(1,2));
-		panel3=new JPanel(new GridLayout(1,2));
-		panel4=new JPanel(new GridLayout(1,2));
+		//panel1.add( new JLabel("도서 관리 프로그램"));
+		panel2=new JPanel(new GridLayout(1,1));
+		panel3=new JPanel(new GridLayout(1,1));
+		panel4=new JPanel(new GridLayout(0,1));
 		jp1=new JPanel();
-		jp2=new JPanel();
+		//jp2=new JPanel();
 		jp3=new JPanel();
-		jp4=new JPanel(new GridLayout(1,2));
+		jp4=new JPanel(new GridLayout(1,3));
 		jp1.setBorder(new TitledBorder("추가/수정"));
-		a=0;
-		//if(a!=0)
+	
 		jp3.setBorder(new TitledBorder("도서 목록"));
 		jp4.setBorder(new TitledBorder("도서 정보"));
 		
+		id=new JTextField(10);
+		pw=new JTextField(10);	
 		
 		title=new JTextField(10);
 		publisher=new JTextField(10);
@@ -97,7 +105,8 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 		availability=new JTextField(10);
 		renting=new JTextField(10);
 		
-
+		panel1.add(id);
+		panel1.add(pw);
 		jp1.add(new Label("도서 제목     "));
 		jp1.add(title);
 		jp1.add(new Label("출판사        "));
@@ -106,20 +115,23 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 		jp1.add(authors);
 		jp1.add(new Label("고유 번호    "));
 		jp1.add(isbn);
-		jp1.add(new Label("대출가능여부         "));
+		jp1.add(new Label("대출가능여부"));
 		jp1.add(availability);
 		jp1.add(new Label("대출자     "));
 		jp1.add(renting);
 		
-	
+		Jlogin=new JButton("로그인");
+		Jjoin=new JButton("회원가입");
 		Jadd=new JButton("추가");
 		Jmod=new JButton("수정");
 		Jdel=new JButton("삭제");
 		
+		panel1.add(Jlogin);
+		panel1.add(Jjoin);
 		
-		jp2.add(Jadd);
-		jp2.add(Jmod);
-		jp2.add(Jdel);
+		jp1.add(Jadd);
+		jp1.add(Jmod);
+		jp1.add(Jdel);
 		 
 	
 		list=new JList();
@@ -132,10 +144,10 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 		int v=ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 		int h=ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
 		JScrollPane jsp = new JScrollPane(info,v,h);
-		jp4.add(icon,BorderLayout.CENTER);
+		//jp4.add(icon,BorderLayout.CENTER);
 		jp4.add(jsp);
 		
-		panel3.add(jp2,BorderLayout.CENTER);
+		//panel3.add(jp2);//,BorderLayout.CENTER);
 		panel3.add(jp3);
 		panel2.add(jp1);
 		panel2.add(panel3);
@@ -154,10 +166,13 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 		c.add(panel1,BorderLayout.NORTH);
 		c.add(panel4,BorderLayout.CENTER);
 		
-			
+		Jlogin.addActionListener(this);
+		Jjoin.addActionListener(this);
+		
 		Jadd.addActionListener(this);
 		Jmod.addActionListener(this);
 		Jdel.addActionListener(this);
+		JSearch.addActionListener(this);
 		list.addListSelectionListener(this);
 		jmi1.addActionListener(this);
 		jmi2.addActionListener(this);
@@ -182,12 +197,13 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 
 	if(event.getSource()==Jadd)//객체이름))//if(event.getActionCommand().equals("추가"//라벨이름))
 	{
-		Library newLibrary=new Library(title.getText(),publisher.getText(),authors.getText(),isbn.getText(),availability.getText(),renting.getText());
-		library.addMovie(newLibrary);
+		
+		Library newLibrary=new Library(title.getText(),publisher.getText(),authors.getText(),isbn.getText(),availability.getText(),renting.getText());//id.getText(),pw.getText(),name.getText(),major.getText());
+		library.addLibrary(newLibrary);
 			Vector Title=new Vector();
 			for(int i=0;i<library.getLibraryCount();i++)
 			{
-				Title.addElement(library.getMovieAt(i).getTitle());
+				Title.addElement(library.getLibraryAt(i).getTitle());
 				
 			}
 			list.setListData(Title);
@@ -199,7 +215,6 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 			isbn.setText("");
 			availability.setText("");
 			renting.setText("");
-		
 			
 			
 	}
@@ -215,7 +230,7 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 		newLibrary2.setPublisher(publisher.getText());
 		newLibrary2.setAuthors(authors.getText());
 		newLibrary2.setIsbn(isbn.getText());
-		newLibrary2.setAvailability(availability.getText());
+		newLibrary2.setAvailibility(availability.getText());
 		newLibrary2.setRenting(renting.getText());
 	
 		info.setText("");
@@ -230,9 +245,9 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 		
 		Vector Title=new Vector();
 		
-		for(int i=0;i<movie.getLibraryCount();i++)
+		for(int i=0;i<library.getLibraryCount();i++)
 		{
-			Title.addElement(movie.getLibraryAt(i).getTitle());
+			Title.addElement(library.getLibraryAt(i).getTitle());
 		}
 		
 		list.setListData(Title);
@@ -246,7 +261,7 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 	else if(event.getSource()==Jdel)
 	{
 		
-		movie.delLibrary(list.getSelectedIndex());
+		library.delLibrary(list.getSelectedIndex());
 		info.setText("");
 		info.setText(library.toString());
 		title.setText("");
@@ -257,9 +272,9 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 		renting.setText("");
 		
 		Vector Title=new Vector();
-		for(int i=0;i<movie.getLibraryCount();i++)
+		for(int i=0;i<library.getLibraryCount();i++)
 		{
-			Title.addElement(movie.getLibraryAt(i).getTitle());
+			Title.addElement(library.getLibraryAt(i).getTitle());
 			
 		}
 		list.setListData(Title);
@@ -268,20 +283,42 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 	}
 	
 	
+	else if(event.getSource()==Jsearch)//객체이름))//if(event.getActionCommand().equals("추가"//라벨이름))
+	{
+ 
+		String str=curious.getText();
+		info.setText("");
+		String title;
+			Vector Title=new Vector();
+			list.setListData(Title);
+			for(int i=0;i<library.getLibraryCount();i++)
+			{
+				title=(library.getLibraryAt(i).getTitle());
+				if(title.contains(str))
+				{
+					Title.addElement(library.getLibraryAt(i).getTitle());
+					info.setText(library.getLibraryAt(i).getTitle());
+				}
+			}
+			list.setListData(Title);
+			curious.setText("");
+	}
+	
+	
 	else if((event.getActionCommand()).equals("불러오기"))
 	{
 		try{
 			
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream("movieinfo.txt"));
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream("libraryinfo.txt"));
 			int count=ois.readInt();
-			movie=(LibraryCollection)ois.readObject();
+			library=(LibraryCollection)ois.readObject();
 			info.setText("");
 			info.append(library.toString());
 			
 			Vector Title=new Vector();
 			for(int i=0;i<count;i++)
 			{
-				Title.addElement(movie.getLibraryAt(i).getTitle());
+				Title.addElement(library.getLibraryAt(i).getTitle());
 				
 			}
 			list.setListData(Title);
@@ -301,8 +338,8 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 	else if((event.getActionCommand()).equals("저장하기"))
 	{
 		try {
-				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("movieinfo.txt"));
-				oos.writeInt(movie.getLibraryCount());
+				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("libraryinfo.txt"));
+				oos.writeInt(library.getLibraryCount());
 				oos.writeObject((Object)library);oos.close();
 				info.setText("저장됐습니다!");
 				oos.close();
@@ -321,13 +358,13 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 	//------------------------------------------------------------------------------
 	public void valueChanged(ListSelectionEvent event){
 
-		Library newLibrary2=movie.getLibraryAt(list.getSelectedIndex());
+		Library newLibrary2=library.getLibraryAt(list.getSelectedIndex());
 		title.setText(newLibrary2.getTitle());
-		publisher.setText(newLibrary2.getImage());
-		authors.setText(newLibrary2.getGenre());
-		isbn.setText(newLibrary2.getRunningtime());
-		availability.setText(newLibrary2.getNation());
-		renting.setText(newLibrary2.getFilmratings());
+		publisher.setText(newLibrary2.getPublisher());
+		authors.setText(newLibrary2.getAuthors());
+		isbn.setText(newLibrary2.getIsbn());
+		availability.setText(newLibrary2.getAvailibility());
+		renting.setText(newLibrary2.getRenting());
 		
 		info.setText("");
 		info.append(newLibrary2.toString());
@@ -346,7 +383,7 @@ public class TestLibrary //extends Frame
 		new TestLibraryDemo();
 	}
 }/**
-public TestMovie(){
+public TestLibrary(){
 	super("제목");
 	this.init();
 	this.start();
