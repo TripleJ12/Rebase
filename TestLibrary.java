@@ -22,7 +22,6 @@ class TestLibraryDemo extends JFrame implements ActionListener, ListSelectionLis
 	private JPanel panel3;
 	private JPanel panel4;
 	private JPanel jp1;
-	//private JPanel jp2;
 	private JPanel jp3;
 	private JPanel jp4;
 	
