@@ -8,6 +8,7 @@ public class Library implements Serializable
 	private String isbn;//고유번호
 	private String availibility;//대출가능여부
 	private String renting;//대출자
+	//회원가입 변수 추가
 	//private String id;//ID
 	//private String pw; //Password
 	//private String name;//학생 이름
